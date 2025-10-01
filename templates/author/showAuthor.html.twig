@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'auteur{% endblock %}
+
+{% block body %}
+{% if author %}
+    <h1>{{ author.username }}</h1>
+    <img src="{{ asset(author.picture) }}" width="150">
+    <p>Email : {{ author.email }}</p>
+    <p>Nombre de livres : {{ author.nb_books }}</p>
+{% else %}
+    <p>Auteur introuvable</p>
+{% endif %}
+
+<a href="{{ path('list_authors') }}">Retour à la liste</a>
+{% endblock %}

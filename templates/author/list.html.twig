@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des auteurs{% endblock %}
+
+{% block body %}
+<h1>Liste des auteurs</h1>
+
+{% if authors is not defined or authors is empty %}
+    <p>Aucun auteur trouvé</p>
+{% else %}
+    <ul>
+        {% for author in authors %}
+            <li>
+                <img src="{{ asset(author.picture) }}" width="80">
+                {{ author.username|upper }} - {{ author.email }}
+                ({{ author.nb_books }} livres)
+                <a href="{{ path('author_details', {'id': author.id}) }}">Détails</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p>Nombre total d’auteurs : {{ authors|length }}</p>
+    <p>Total de livres : {{ authors|map(a => a.nb_books)|reduce((carry, v) => carry + v) }}</p>
+{% endif %}
+{% endblock %}
