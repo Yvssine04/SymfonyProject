@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un Auteur{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h2>Modifier un Auteur</h2>
+
+        {{ form_start(formAuthor) }}
+            {{ form_widget(formAuthor) }}
+        {{ form_end(formAuthor) }}
+    </div>
+{% endblock %}

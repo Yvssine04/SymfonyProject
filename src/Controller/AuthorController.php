@@ -2,7 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Author;
+use App\Form\AuthorType;
+use App\Repository\AuthorRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\ManagerRegistry as DoctrineManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -54,4 +60,80 @@ final class AuthorController extends AbstractController
             'author' => $author
         ]);
     }
+
+    #[route('/showAll',name:'ShowAll')]
+    public function ShowAll(AuthorRepository $repo){
+    $authors=$repo->findAll();
+        return $this->render('author/showAll.html.twig',['list'=>$authors]);
+    }
+
+    #[route('/addStat',name:'addStat')]
+    public function addStat(ManagerRegistry $doctrine){
+        $author=new Author();
+        $author->setEmail(email: 'foulen5@gmail.com');
+        $author->setUsername(username: 'foulen5');
+        $em=$doctrine->getManager();
+        $em->persist($author);
+        $em->flush();
+
+        //return new response("Author aadded succesfully")
+        return $this->redirectToRoute('ShowAll');
+    
+    }
+
+
+     #[Route('/deleteAuthor/{id}',name:'deleteAuthor')]
+    public function deleteAuthor($id,AuthorRepository $repo,ManagerRegistry $manager){
+          $author=$repo->find($id);
+          $em=$manager->getManager();
+          $em->remove($author);
+          $em->flush();
+          return $this->redirectToRoute('ShowAll');
+    }
+
+    #[Route('/showAuthorDetails/{id}',name:'showAuthorDetails')]
+    public function showAuthorDetails($id, AuthorRepository $repo){
+     $author=$repo->find($id);
+     return $this->render('author/showDetails.html.twig',['author'=>$author]);
+    }
+
+    #[Route('/addform', name:'addForm')]
+    public function addform(ManagerRegistry $doctrine)
+    {
+     $author = new Author();
+    $form = $this->createForm(AuthorType::class, $author);
+    $form->add('Ajouter', \Symfony\Component\Form\Extension\Core\Type\SubmitType::class);
+    $form->handleRequest(\Symfony\Component\HttpFoundation\Request::createFromGlobals());
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em = $doctrine->getManager();
+        $em->persist($author);
+        $em->flush();
+    }
+    return $this->render('author/addform.html.twig', [
+        'formAuthor' => $form->createView()
+    ]);
+    }
+
+    #[Route('/updateform/{id}', name:'updateForm')]
+    public function updateform(ManagerRegistry $doctrine, Request $request, $id)
+    {
+     $author = $doctrine->getRepository(Author::class)->find($id);
+    $form = $this->createForm(AuthorType::class, $author);
+    $form->add('Modifier', \Symfony\Component\Form\Extension\Core\Type\SubmitType::class);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em = $doctrine->getManager();
+        $em->flush();
+        return $this->redirectToRoute('ShowAll');
+    }
+    return $this->render('author/updateform.html.twig', [
+        'formAuthor' => $form->createView()
+    ]);
+    }
+
+
+
+
 }
